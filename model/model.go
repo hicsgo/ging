@@ -34,7 +34,7 @@ type BaseModel struct {
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  * 实例化ReadDbMap
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func (baseModel *BaseModel) ReadModelDbMap(s sharing.ISharing, isWriteDB bool) {
+func (baseModel *BaseModel) ReadModelDbMap(s sharing.ISharing) {
 
 	baseModel.TableName = s.GetReadTableName()
 	baseModel.ProjectName = s.GetProjectName()
