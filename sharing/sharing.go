@@ -68,13 +68,13 @@ func GetWriteDatabaseMap(projectName string, setting setting.Setting) *gorm.DB {
 	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
 		if dbOption.ProjectName == projectName {
 
-			//读库配置数量
-			readDBCount := len(setting.DatabaseConfig.DatabaseOptions[i].WirteDBConns)
-			if readDBCount == 0 {
+			//写库配置数量
+			writeDBCount := len(setting.DatabaseConfig.DatabaseOptions[i].WirteDBConns)
+			if writeDBCount == 0 {
 				break
 			} else {
 				//随机拉取一个数据库(可以根据权重获取)
-				index := rand.Intn(readDBCount)
+				index := rand.Intn(writeDBCount)
 				currentDatabase = dbOption.WirteDBConns[index]
 				isLog = dbOption.WirteDBConns[index].IsLog
 			}
