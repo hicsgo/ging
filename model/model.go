@@ -25,25 +25,35 @@ import (
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 type BaseModel struct {
 	//Id       string   `gorm:"primary_key;column:id"`
-	DbMap     *gorm.DB `msgpack:"-" sql:"-" json:"-"`
-	DBName    string   `msgpack:"-" sql:"-" json:"-"`
-	TableName string   `msgpack:"-" sql:"-" json:"-"`
+	DbMap       *gorm.DB `msgpack:"-" sql:"-" json:"-"`
+	DBKeyName   string   `msgpack:"-" sql:"-" json:"-"`
+	TableName   string   `msgpack:"-" sql:"-" json:"-"`
+	ProjectName string   `msgpack:"-" sql:"-" json:"-"`
 }
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * 实例化DbMap
+ * 实例化ReadDbMap
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func (baseModel *BaseModel) ModelDbMap(s sharing.ISharing, isWriteDB bool) {
+func (baseModel *BaseModel) ReadModelDbMap(s sharing.ISharing, isWriteDB bool) {
 
-	if isWriteDB {
-		baseModel.DBName = s.GetWriteDBName()
-		baseModel.TableName = s.GetWriteTableName()
-	} else {
-		baseModel.DBName = s.GetReadDBName()
-		baseModel.TableName = s.GetReadTableName()
-	}
+	baseModel.DBKeyName = s.GetReadDBKeyName()
+	baseModel.TableName = s.GetReadTableName()
+	baseModel.ProjectName = s.GetProjectName()
 
-	dbMap := sharing.GetDatabaseMap(baseModel.DBName, *setting_config.GlobalSetting)
+	dbMap := sharing.GetReadDatabaseMap(baseModel.DBKeyName, baseModel.ProjectName, *setting_config.GlobalSetting)
+	baseModel.DbMap = dbMap
+}
+
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * 实例化WirteDbMap
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+func (baseModel *BaseModel) WriteModelDbMap(s sharing.ISharing) {
+
+	baseModel.DBKeyName = s.GetWriteDBKeyName()
+	baseModel.TableName = s.GetWriteTableName()
+	baseModel.ProjectName = s.GetProjectName()
+
+	dbMap := sharing.GetWriteDatabaseMap(baseModel.DBKeyName, baseModel.ProjectName, *setting_config.GlobalSetting)
 	baseModel.DbMap = dbMap
 }
 
@@ -91,17 +101,14 @@ func (baseModel *BaseModel) AfterDelete(scope *gorm.Scope) {
 */
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * 事务
+ * 事务(只支持写库同一个库事务)
  * fun: 回调函数，接受事务DbMap
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func (baseModel *BaseModel) Transactions(s sharing.ISharing, isWriteDB bool, fun func(dbMap *gorm.DB)) error {
-	if isWriteDB {
-		baseModel.DBName = s.GetWriteDBName()
-		baseModel.TableName = s.GetWriteTableName()
-	} else {
-		baseModel.DBName = s.GetReadDBName()
-		baseModel.TableName = s.GetReadTableName()
-	}
+func (baseModel *BaseModel) Transactions(s sharing.ISharing, fun func(dbMap *gorm.DB)) error {
+
+	baseModel.DBKeyName = s.GetWriteDBKeyName()
+	baseModel.TableName = s.GetWriteTableName()
+	baseModel.ProjectName = s.GetProjectName()
 
 	var tranDbMap *gorm.DB = nil
 	defer func() {
@@ -113,7 +120,7 @@ func (baseModel *BaseModel) Transactions(s sharing.ISharing, isWriteDB bool, fun
 	err := glib.Capture2(
 		func() {
 			log.Printf("Trans Begin")
-			tranDbMap = sharing.GetDatabaseMap(baseModel.DBName, *setting_config.GlobalSetting).Begin()
+			tranDbMap = sharing.GetWriteDatabaseMap(baseModel.DBKeyName, baseModel.ProjectName, *setting_config.GlobalSetting).Begin()
 			baseModel.DbMap = tranDbMap
 
 			fun(tranDbMap)

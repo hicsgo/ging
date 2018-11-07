@@ -12,6 +12,7 @@ import (
 
 import (
 	"ging/setting"
+	"math/rand"
 )
 
 /* ================================================================================
@@ -24,31 +25,99 @@ import (
  * 数据库(库/表名)接口
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 type ISharing interface {
-	GetReadDBName() string
+	GetReadDBKeyName() string
 	GetReadTableName() string
-	GetWriteDBName() string
+	GetWriteDBKeyName() string
 	GetWriteTableName() string
+	GetProjectName() string
 }
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * 获取DatabaseMap
+ * 获取ReadDatabaseMap
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func GetDatabaseMap(dbKey string, setting setting.Setting) *gorm.DB {
+func GetReadDatabaseMap(dbKey, projectName string, setting setting.Setting) *gorm.DB {
 	var currentDatabase *setting.DatabaseConnectionOption
-	for _, database := range setting.DatabaseConfig.Connections {
-		if database.Key == dbKey {
-			currentDatabase = database
-			break
+	isLog := true
+	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
+		if dbOption.ProjectName == projectName {
+			for _, database := range setting.DatabaseConfig.DatabaseOptions[i].ReadDBConns {
+				if database.Key == dbKey {
+					currentDatabase = database
+					isLog = database.IsLog
+					break
+				}
+			}
 		}
 	}
-
-	isLog := setting.DatabaseConfig.IsLog
 	dbMap, err := getDatabaseConnection(*currentDatabase, isLog)
 	if err != nil {
 		panic(fmt.Sprintf("database connection fault: %s", err.Error()))
 	}
 
 	return dbMap
+}
+
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * 获取WriteDatabaseMap
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+func GetWriteDatabaseMap(dbKey, projectName string, setting setting.Setting) *gorm.DB {
+	var currentDatabase *setting.DatabaseConnectionOption
+	isLog := true
+	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
+		if dbOption.ProjectName == projectName {
+			for _, database := range setting.DatabaseConfig.DatabaseOptions[i].WirteDBConns {
+				if database.Key == dbKey {
+					currentDatabase = database
+					isLog = database.IsLog
+					break
+				}
+			}
+		}
+	}
+	dbMap, err := getDatabaseConnection(*currentDatabase, isLog)
+	if err != nil {
+		panic(fmt.Sprintf("database connection fault: %s", err.Error()))
+	}
+
+	return dbMap
+}
+
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * 根据项目名称获取获取读库的key
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+func GetReadDBKey(projectName string) string {
+	dbKey := ""
+	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
+		if dbOption.ProjectName == projectName {
+			readbConnCount := len(setting.DatabaseConfig.DatabaseOptions[i].ReadDBConns)
+			if readbConnCount == 0 {
+				break
+			} else {
+				index := rand.Intn(readbConnCount) //随机拉取一个数据库
+				dbKey = dbOption.ReadDBConns[index].Key
+			}
+		}
+	}
+	return dbKey
+}
+
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * 根据项目名称获取获取写库的key
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+func GetWirteDBKey(projectName string) string {
+	dbKey := ""
+	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
+		if dbOption.ProjectName == projectName {
+			readbConnCount := len(setting.DatabaseConfig.DatabaseOptions[i].WirteDBConns)
+			if readbConnCount == 0 {
+				break
+			} else {
+				index := rand.Intn(readbConnCount) //随机拉取一个数据库
+				dbKey = dbOption.WirteDBConns[index].Key
+			}
+		}
+	}
+	return dbKey
 }
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
