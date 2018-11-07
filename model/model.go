@@ -36,11 +36,10 @@ type BaseModel struct {
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 func (baseModel *BaseModel) ReadModelDbMap(s sharing.ISharing, isWriteDB bool) {
 
-	baseModel.DBKeyName = s.GetReadDBKeyName()
 	baseModel.TableName = s.GetReadTableName()
 	baseModel.ProjectName = s.GetProjectName()
 
-	dbMap := sharing.GetReadDatabaseMap(baseModel.DBKeyName, baseModel.ProjectName, *setting_config.GlobalSetting)
+	dbMap := sharing.GetReadDatabaseMap( baseModel.ProjectName, *setting_config.GlobalSetting)
 	baseModel.DbMap = dbMap
 }
 
@@ -49,11 +48,10 @@ func (baseModel *BaseModel) ReadModelDbMap(s sharing.ISharing, isWriteDB bool) {
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 func (baseModel *BaseModel) WriteModelDbMap(s sharing.ISharing) {
 
-	baseModel.DBKeyName = s.GetWriteDBKeyName()
 	baseModel.TableName = s.GetWriteTableName()
 	baseModel.ProjectName = s.GetProjectName()
 
-	dbMap := sharing.GetWriteDatabaseMap(baseModel.DBKeyName, baseModel.ProjectName, *setting_config.GlobalSetting)
+	dbMap := sharing.GetWriteDatabaseMap( baseModel.ProjectName, *setting_config.GlobalSetting)
 	baseModel.DbMap = dbMap
 }
 
@@ -106,7 +104,6 @@ func (baseModel *BaseModel) AfterDelete(scope *gorm.Scope) {
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 func (baseModel *BaseModel) Transactions(s sharing.ISharing, fun func(dbMap *gorm.DB)) error {
 
-	baseModel.DBKeyName = s.GetWriteDBKeyName()
 	baseModel.TableName = s.GetWriteTableName()
 	baseModel.ProjectName = s.GetProjectName()
 
@@ -120,7 +117,7 @@ func (baseModel *BaseModel) Transactions(s sharing.ISharing, fun func(dbMap *gor
 	err := glib.Capture2(
 		func() {
 			log.Printf("Trans Begin")
-			tranDbMap = sharing.GetWriteDatabaseMap(baseModel.DBKeyName, baseModel.ProjectName, *setting_config.GlobalSetting).Begin()
+			tranDbMap = sharing.GetWriteDatabaseMap(baseModel.ProjectName, *setting_config.GlobalSetting).Begin()
 			baseModel.DbMap = tranDbMap
 
 			fun(tranDbMap)
