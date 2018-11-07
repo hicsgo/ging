@@ -25,9 +25,7 @@ import (
  * 数据库(库/表名)接口
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 type ISharing interface {
-	GetReadDBKeyName() string
 	GetReadTableName() string
-	GetWriteDBKeyName() string
 	GetWriteTableName() string
 	GetProjectName() string
 }
@@ -35,17 +33,21 @@ type ISharing interface {
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  * 获取ReadDatabaseMap
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func GetReadDatabaseMap(dbKey, projectName string, setting setting.Setting) *gorm.DB {
+func GetReadDatabaseMap(projectName string, setting setting.Setting) *gorm.DB {
 	var currentDatabase *setting.DatabaseConnectionOption
 	isLog := true
 	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
 		if dbOption.ProjectName == projectName {
-			for _, database := range setting.DatabaseConfig.DatabaseOptions[i].ReadDBConns {
-				if database.Key == dbKey {
-					currentDatabase = database
-					isLog = database.IsLog
-					break
-				}
+
+			//读库配置数量
+			readDBCount := len(setting.DatabaseConfig.DatabaseOptions[i].ReadDBConns)
+			if readDBCount == 0 {
+				break
+			} else {
+				//随机拉取一个数据库(可以根据权重获取)
+				index := rand.Intn(readDBCount)
+				currentDatabase = dbOption.ReadDBConns[index]
+				isLog = dbOption.ReadDBConns[index].IsLog
 			}
 		}
 	}
@@ -60,17 +62,21 @@ func GetReadDatabaseMap(dbKey, projectName string, setting setting.Setting) *gor
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  * 获取WriteDatabaseMap
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func GetWriteDatabaseMap(dbKey, projectName string, setting setting.Setting) *gorm.DB {
+func GetWriteDatabaseMap(projectName string, setting setting.Setting) *gorm.DB {
 	var currentDatabase *setting.DatabaseConnectionOption
 	isLog := true
 	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
 		if dbOption.ProjectName == projectName {
-			for _, database := range setting.DatabaseConfig.DatabaseOptions[i].WirteDBConns {
-				if database.Key == dbKey {
-					currentDatabase = database
-					isLog = database.IsLog
-					break
-				}
+
+			//读库配置数量
+			readDBCount := len(setting.DatabaseConfig.DatabaseOptions[i].WirteDBConns)
+			if readDBCount == 0 {
+				break
+			} else {
+				//随机拉取一个数据库(可以根据权重获取)
+				index := rand.Intn(readDBCount)
+				currentDatabase = dbOption.WirteDBConns[index]
+				isLog = dbOption.WirteDBConns[index].IsLog
 			}
 		}
 	}
@@ -80,44 +86,6 @@ func GetWriteDatabaseMap(dbKey, projectName string, setting setting.Setting) *go
 	}
 
 	return dbMap
-}
-
-/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * 根据项目名称获取获取读库的key
- * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func GetReadDBKey(projectName string) string {
-	dbKey := ""
-	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
-		if dbOption.ProjectName == projectName {
-			readbConnCount := len(setting.DatabaseConfig.DatabaseOptions[i].ReadDBConns)
-			if readbConnCount == 0 {
-				break
-			} else {
-				index := rand.Intn(readbConnCount) //随机拉取一个数据库
-				dbKey = dbOption.ReadDBConns[index].Key
-			}
-		}
-	}
-	return dbKey
-}
-
-/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * 根据项目名称获取获取写库的key
- * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func GetWirteDBKey(projectName string) string {
-	dbKey := ""
-	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
-		if dbOption.ProjectName == projectName {
-			readbConnCount := len(setting.DatabaseConfig.DatabaseOptions[i].WirteDBConns)
-			if readbConnCount == 0 {
-				break
-			} else {
-				index := rand.Intn(readbConnCount) //随机拉取一个数据库
-				dbKey = dbOption.WirteDBConns[index].Key
-			}
-		}
-	}
-	return dbKey
 }
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
