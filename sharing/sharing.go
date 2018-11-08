@@ -4,15 +4,12 @@ import (
 	"fmt"
 	"time"
 	"log"
+	"math/rand"
 )
 
 import (
 	"github.com/jinzhu/gorm"
-)
-
-import (
 	"github.com/hicsgo/ging/setting"
-	"math/rand"
 )
 
 /* ================================================================================
@@ -33,25 +30,25 @@ type ISharing interface {
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  * 获取ReadDatabaseMap
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func GetReadDatabaseMap(projectName string, setting setting.Setting) *gorm.DB {
-	var currentDatabase *setting.DatabaseConnectionOption
+func GetReadDatabaseMap(projectName string, s setting.Setting) *gorm.DB {
+	var currentDatabase setting.DatabaseConnectionOption
 	isLog := true
-	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
+	for i, dbOption := range s.DatabaseConfig.DatabaseOptions {
 		if dbOption.ProjectName == projectName {
 
 			//读库配置数量
-			readDBCount := len(setting.DatabaseConfig.DatabaseOptions[i].ReadDBConns)
+			readDBCount := len(s.DatabaseConfig.DatabaseOptions[i].ReadDBConns)
 			if readDBCount == 0 {
 				break
 			} else {
 				//随机拉取一个数据库(可以根据权重获取)
 				index := rand.Intn(readDBCount)
-				currentDatabase = dbOption.ReadDBConns[index]
+				currentDatabase = *dbOption.ReadDBConns[index]
 				isLog = dbOption.ReadDBConns[index].IsLog
 			}
 		}
 	}
-	dbMap, err := getDatabaseConnection(*currentDatabase, isLog)
+	dbMap, err := getDatabaseConnection(currentDatabase, isLog)
 	if err != nil {
 		panic(fmt.Sprintf("database connection fault: %s", err.Error()))
 	}
@@ -62,25 +59,25 @@ func GetReadDatabaseMap(projectName string, setting setting.Setting) *gorm.DB {
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  * 获取WriteDatabaseMap
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func GetWriteDatabaseMap(projectName string, setting setting.Setting) *gorm.DB {
-	var currentDatabase *setting.DatabaseConnectionOption
+func GetWriteDatabaseMap(projectName string, s setting.Setting) *gorm.DB {
+	var currentDatabase setting.DatabaseConnectionOption
 	isLog := true
-	for i, dbOption := range setting.DatabaseConfig.DatabaseOptions {
+	for i, dbOption := range s.DatabaseConfig.DatabaseOptions {
 		if dbOption.ProjectName == projectName {
 
 			//写库配置数量
-			writeDBCount := len(setting.DatabaseConfig.DatabaseOptions[i].WirteDBConns)
+			writeDBCount := len(s.DatabaseConfig.DatabaseOptions[i].WirteDBConns)
 			if writeDBCount == 0 {
 				break
 			} else {
 				//随机拉取一个数据库(可以根据权重获取)
 				index := rand.Intn(writeDBCount)
-				currentDatabase = dbOption.WirteDBConns[index]
+				currentDatabase = *dbOption.WirteDBConns[index]
 				isLog = dbOption.WirteDBConns[index].IsLog
 			}
 		}
 	}
-	dbMap, err := getDatabaseConnection(*currentDatabase, isLog)
+	dbMap, err := getDatabaseConnection(currentDatabase, isLog)
 	if err != nil {
 		panic(fmt.Sprintf("database connection fault: %s", err.Error()))
 	}
