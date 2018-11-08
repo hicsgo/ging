@@ -22,8 +22,7 @@ import (
  * 数据库(库/表名)接口
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 type ISharing interface {
-	GetReadTableName() string
-	GetWriteTableName() string
+	TableName() string
 	GetProjectName() string
 }
 
