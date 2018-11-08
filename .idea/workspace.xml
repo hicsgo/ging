@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d5b4b678-589c-4e0a-ba5f-7e232f80f2d5" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/sharing/sharing.go" afterPath="$PROJECT_DIR$/sharing/sharing.go" />
-    </list>
+    <list default="true" id="d5b4b678-589c-4e0a-ba5f-7e232f80f2d5" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -272,12 +269,12 @@
       <workItem from="1541149513073" duration="7066000" />
       <workItem from="1541210945565" duration="23000" />
       <workItem from="1541211053486" duration="23283000" />
-      <workItem from="1541663641750" duration="25000" />
+      <workItem from="1541663641750" duration="86000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="30397000" />
+    <option name="totallyTimeSpent" value="30458000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="712" extended-state="0" />
