@@ -11,7 +11,7 @@ import (
 )
 
 import (
-	"ging/setting"
+	"github.com/hicsgo/ging/setting"
 	"math/rand"
 )
 
