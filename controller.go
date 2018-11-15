@@ -109,10 +109,13 @@ func (ctrl *Controller) SetCtrlFilters(filters ...IActionFilter) IController {
 	fmt.Println("come here ***** ", len(filters), filters)
 	if len(ctrl.filters) == 0 {
 		ctrl.filters = make([]IActionFilter, len(filters))
+		fmt.Println("come here $$$",len(ctrl.filters))
 	}
 	for i, ctrlFilter := range filters {
 		fmt.Println("come here ###", i, ctrlFilter)
 		ctrl.filters = append(ctrl.filters, ctrlFilter)
+		fmt.Println("come here xxxxx",len(ctrl.filters))
 	}
+	fmt.Println("come here oooo",len(ctrl.filters))
 	return ctrl
 }
