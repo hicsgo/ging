@@ -49,13 +49,12 @@ func (ctrl *Controller) Action(action func(ctx *gin.Context) IActionResult, args
 		//启用拦截
 		if isEnabled {
 			//控制器的Before拦截器拦截
-			for i, ctrlBeforeFilter := range ctrl.filters {
-				fmt.Println("come here ", len(ctrl.filters), "____", i, "____", ctrlBeforeFilter, )
-				//if ctrlBeforeFilter != nil {
-				if filterResult = ctrlBeforeFilter.Before(ctx); filterResult != nil {
-					break
+			for _, ctrlBeforeFilter := range ctrl.filters {
+				if ctrlBeforeFilter != nil {
+					if filterResult = ctrlBeforeFilter.Before(ctx); filterResult != nil {
+						break
+					}
 				}
-				//}
 
 			}
 
