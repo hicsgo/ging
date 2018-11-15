@@ -51,17 +51,22 @@ func (ctrl *Controller) Action(action func(ctx *gin.Context) IActionResult, args
 		if isEnabled {
 			//控制器的Before拦截器拦截
 			for _, ctrlBeforeFilter := range ctrl.filters {
-				if filterResult = ctrlBeforeFilter.Before(ctx); filterResult != nil {
-					break
+				if ctrlBeforeFilter != nil {
+					if filterResult = ctrlBeforeFilter.Before(ctx); filterResult != nil {
+						break
+					}
 				}
+
 			}
 
 			//控制的Before拦截器通过
 			if filterResult == nil {
 				//方法Before拦截
 				for _, actionBeforeFilter := range actionFilters {
-					if filterResult = actionBeforeFilter.Before(ctx); filterResult != nil {
-						break
+					if actionBeforeFilter != nil {
+						if filterResult = actionBeforeFilter.Before(ctx); filterResult != nil {
+							break
+						}
 					}
 				}
 			}
@@ -77,12 +82,16 @@ func (ctrl *Controller) Action(action func(ctx *gin.Context) IActionResult, args
 		if isEnabled {
 			//控制器的After过滤器
 			for _, ctrlAfterFilter := range ctrl.filters {
-				ctrlAfterFilter.After(ctx) //一次执行过滤
+				if ctrlAfterFilter != nil {
+					ctrlAfterFilter.After(ctx) //一次执行过滤
+				}
 			}
 
 			//方法的After过滤器
 			for _, actionAfterFilter := range actionFilters {
-				actionAfterFilter.After(ctx)
+				if actionAfterFilter != nil {
+					actionAfterFilter.After(ctx)
+				}
 			}
 		}
 	}
