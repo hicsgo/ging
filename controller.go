@@ -69,9 +69,9 @@ func (ctrl *Controller) Action(action func(ctx *gin.Context) IActionResult, args
 
 		//拦截成功
 		if filterResult != nil {
-			filterResult.Reder() //渲染拦截结果
+			filterResult.Render() //渲染拦截结果
 		} else {
-			action(ctx).Reder() //执行真正的Handler方法，渲染返回结果
+			action(ctx).Render() //执行真正的Handler方法，渲染返回结果
 		}
 
 		if isEnabled {
