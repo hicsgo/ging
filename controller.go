@@ -54,9 +54,9 @@ func (ctrl *Controller) Action(action func(ctx *gin.Context) IActionResult, args
 			for i, ctrlBeforeFilter := range ctrl.filters {
 				fmt.Println("come here ", len(ctrl.filters), "____", i, "____", ctrlBeforeFilter, )
 				//if ctrlBeforeFilter != nil {
-					if filterResult = ctrlBeforeFilter.Before(ctx); filterResult != nil {
-						break
-					}
+				if filterResult = ctrlBeforeFilter.Before(ctx); filterResult != nil {
+					break
+				}
 				//}
 
 			}
@@ -106,10 +106,12 @@ func (ctrl *Controller) SetCtrlFilters(filters ...IActionFilter) IController {
 	if len(filters) == 0 {
 		return ctrl
 	}
+	fmt.Println("come here ***** ", len(filters), filters)
 	if len(ctrl.filters) == 0 {
 		ctrl.filters = make([]IActionFilter, len(filters))
 	}
-	for _, ctrlFilter := range filters {
+	for i, ctrlFilter := range filters {
+		fmt.Println("come here ###", i, ctrlFilter)
 		ctrl.filters = append(ctrl.filters, ctrlFilter)
 	}
 	return ctrl
