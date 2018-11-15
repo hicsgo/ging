@@ -29,7 +29,8 @@ type (
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 func (ctrl *Controller) Action(action func(ctx *gin.Context) IActionResult, args ...interface{}) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
-		var actionFilters []IActionFilter
+		actionFilters := make([]IActionFilter, 0)
+
 		var filterResult IActionResult
 		isEnabled := true
 		argsCount := len(args)
@@ -39,9 +40,6 @@ func (ctrl *Controller) Action(action func(ctx *gin.Context) IActionResult, args
 			} else {
 				for _, actionFilter := range args {
 					if actionFilter, isOk := actionFilter.(IActionFilter); isOk {
-						if len(actionFilters) == 0 {
-							actionFilters = make([]IActionFilter, argsCount)
-						}
 						actionFilters = append(actionFilters, actionFilter)
 					}
 				}
@@ -106,16 +104,9 @@ func (ctrl *Controller) SetCtrlFilters(filters ...IActionFilter) IController {
 	if len(filters) == 0 {
 		return ctrl
 	}
-	fmt.Println("come here ***** ", len(filters), filters)
-	if len(ctrl.filters) == 0 {
-		ctrl.filters = make([]IActionFilter, len(filters))
-		fmt.Println("come here $$$",len(ctrl.filters))
-	}
-	for i, ctrlFilter := range filters {
-		fmt.Println("come here ###", i, ctrlFilter)
+	ctrl.filters = make([]IActionFilter, 0)
+	for _, ctrlFilter := range filters {
 		ctrl.filters = append(ctrl.filters, ctrlFilter)
-		fmt.Println("come here xxxxx",len(ctrl.filters))
 	}
-	fmt.Println("come here oooo",len(ctrl.filters))
 	return ctrl
 }
