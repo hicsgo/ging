@@ -18,7 +18,7 @@ type IActionResult interface {
 type (
 	ActionResult struct {
 		Context     *gin.Context
-		ContextData interface{}
+		ContentData interface{}
 		ContentType string
 		StatusCode  int
 		IsAbort     bool
