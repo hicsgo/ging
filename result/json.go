@@ -1,6 +1,10 @@
 package result
 
 import (
+	"github.com/gin-gonic/gin"
+)
+
+import (
 	"github.com/hicsgo/ging"
 )
 
@@ -15,16 +19,39 @@ import (
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 type (
 	jsonResult struct {
-		ging.Result
+		ging.ActionResult
 	}
 )
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  * json结果
+ * args case: statusCode | isAbort | statusCode,isAbort
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func JsonResult() ging.IActionResult {
-	jsonResult := &jsonResult{}
-	return jsonResult
+func JsonResult(ctx *gin.Context, data interface{}, args ...interface{}) ging.IActionResult {
+	result := &jsonResult{}
+	result.Context = ctx
+	result.ContentData = data
+	result.StatusCode = 200
+	result.ContentType = "json"
+	argsCount := len(args)
+	if argsCount > 0 {
+		if argsCount == 1 {
+			switch  value := args[0].(type) {
+			case int:
+				result.StatusCode = value
+			case bool:
+				result.IsAbort = value
+			}
+		}
+	} else if argsCount == 2 {
+		if value, isOk := args[0].(int); isOk {
+			result.StatusCode = value
+		}
+		if value, isOk := args[1].(bool); isOk {
+			result.IsAbort = value
+		}
+	}
+	return result
 }
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

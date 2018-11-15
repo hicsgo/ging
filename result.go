@@ -1,7 +1,7 @@
 package ging
 
 import (
-"fmt"
+	"fmt"
 )
 
 /* ================================================================================
@@ -10,14 +10,14 @@ import (
  * author  : hicsgo
  * ================================================================================ */
 type (
-	Result struct {
+	JsonData struct {
 		Code int32
 		Msg  string
 		Data interface{}
 	}
 
-	PagingResult struct {
-		Result
+	PagingData struct {
+		JsonData
 		Paging *Paging
 	}
 )
@@ -25,7 +25,7 @@ type (
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  * 设置错误状态信息
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-func (result *Result) SetError(err error) {
+func (result *JsonData) SetError(err error) {
 	if customErr, ok := err.(*CustomError); ok {
 		result.Code = customErr.Code
 		result.Msg = customErr.Msg
