@@ -38,4 +38,11 @@ type (
 		IsLog    bool   //是否记录日志
 		Weight   int    //权重
 	}
+
+	//达观数据项
+	DataGrand struct {
+		UrlPrefix string //地址前缀eg:http://datareportapi.datagrand.com/data/
+		AppId     string //appid
+		AppName   string //your_app_name
+	}
 )
