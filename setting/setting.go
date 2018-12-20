@@ -43,7 +43,7 @@ type (
 	//达观数据项
 	DataGrand struct {
 		UrlPrefix string //地址前缀eg:http://datareportapi.datagrand.com/data/
-		AppId     string //appid
+		AppId     int64  //appid
 		AppName   string //your_app_name
 	}
 )
