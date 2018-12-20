@@ -11,8 +11,9 @@ type (
      * 全局设置数据模型
      * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 	Setting struct {
-		DatabaseConfig *DatabaseConfig //数据库
-		IsPro          bool            //是否生产环境
+		DatabaseConfig  *DatabaseConfig //数据库
+		IsPro           bool            //是否生产环境
+		DataGrandConfig *DataGrand      //达观配置项
 	}
 
 	/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
